@@ -47,10 +47,10 @@ const recursiveSubroutine = ({ eqn, left, right }) => {
  * @param {string} eqn The equation that is being solved
  * @param {string} variable The variable that is being solved for
  */
-module.exports = ({ eqn, variable, scope }) => {
+module.exports = ({ eqn, variable, scope, guess }) => {
   console.log(chalk.red("Running Bisection method for equation: ", eqn))
   let start = process.hrtime()
-  const { left, right } = findInterval({ eqn, scope, left: 0, right: 0, stepSize: 0.5 })
+  const { left, right } = findInterval({ eqn, scope, left: guess, right: guess, stepSize: 0.5 })
   const result = recursiveSubroutine({ eqn, left, right })
   let end = process.hrtime(start)
   console.log(chalk.red(result))
