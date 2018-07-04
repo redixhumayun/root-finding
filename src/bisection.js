@@ -10,12 +10,33 @@ const chalk = require('chalk')
  * @param {number} stepSize The step limit with which to increase/decrease the interval
  * @param {number} ctr Counter variable  
  */
-const findInterval = ({ eqn, scope, left, right, stepSize, ctr = 0 }) => {
-  while (math.eval(eqn, { x: left }) * math.eval(eqn, { x: right }) >= 0 && ctr++ < 100) {
+const findInterval = ({ eqn, scope, variable, left, right, stepSize, ctr = 0 }) => {
+  let scope_left = Object.assign({}, {...scope})
+  let scope_right = Object.assign({}, {...scope})
+  scope_left[variable] = left
+  scope_right[variable] = right
+
+  let result_left = math.eval(eqn, scope_left)
+  let result_right = math.eval(eqn, scope_right)
+
+  while (math.eval(eqn, scope_left) * math.eval(eqn, scope_right) >= 0 && ctr++ < 300) {
     left -= stepSize
     right += stepSize
+    scope_left[variable] = left
+    scope_right[variable] = right
+    result_left = math.eval(eqn, scope_left)
+    result_right = math.eval(eqn, scope_right)
+    if (Number.isNaN(result_left)) {
+      left -= stepSize
+      scope_left[variable] = left
+      result_left = math.eval(eqn, scope_left)
+    } if (Number.isNaN(result_right)) {
+      right += stepSize
+      scope_right[variable] = right
+      scope_right = math.eval(eqn, scope_right)
+    }
   }
-  if (ctr >= 100) {
+  if (ctr >= 300) {
     throw new Error(`Could not find the interval within ${ctr} iterations`)
   }
   return { left, right }
@@ -27,11 +48,13 @@ const findInterval = ({ eqn, scope, left, right, stepSize, ctr = 0 }) => {
  * @param {number} left
  * @param {number} right 
  */
-const recursiveSubroutine = ({ eqn, left, right }) => {
+const recursiveSubroutine = ({ eqn, left, right, scope, variable }) => {
   while (right - left > Math.exp(-15)) {
     let mid = (left + right) / 2
-    let f_mid = math.eval(eqn, { x: mid })
-    let f_left = math.eval(eqn, { x: left })
+    scope[variable] = mid
+    let f_mid = math.eval(eqn, scope)
+    scope[variable] = left
+    let f_left = math.eval(eqn, scope)
     if (f_left * f_mid > 0) {
       left = mid
     } else {
@@ -50,8 +73,8 @@ const recursiveSubroutine = ({ eqn, left, right }) => {
 module.exports = ({ eqn, variable, scope, guess }) => {
   console.log(chalk.red("Running Bisection method for equation: ", eqn))
   let start = process.hrtime()
-  const { left, right } = findInterval({ eqn, scope, left: guess, right: guess, stepSize: 0.5 })
-  const result = recursiveSubroutine({ eqn, left, right })
+  const { left, right } = findInterval({ eqn, scope, variable, left: guess, right: guess, stepSize: 0.5 })
+  const result = recursiveSubroutine({ eqn, left, right, scope, variable })
   let end = process.hrtime(start)
   console.log(chalk.red(result))
   console.log(chalk.red(`Execution time: ${chalk.red(end[0])}s ${chalk.red(end[1]/1000000)}ms`))

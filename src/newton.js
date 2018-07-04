@@ -36,7 +36,7 @@ module.exports = ({ eqn, variable, scope, guess }) => {
     console.log(chalk.blue("Running Newton's method for equation: ", eqn))
     let start = process.hrtime()
     const der = math.derivative(eqn, variable)
-    const result = recursiveSubRoutine({ f: eqn, fp: der, guess, maxIter: 20, curr: 0, scope, variable })
+    const result = recursiveSubRoutine({ f: eqn, fp: der, guess, maxIter: 40, curr: 0, scope, variable })
     let end = process.hrtime(start)
     console.log(chalk.blue(result))
     console.log(chalk.blue(`Execution time: ${chalk.blue(end[0])}s ${chalk.blue(end[1]/1000000)}ms`))
