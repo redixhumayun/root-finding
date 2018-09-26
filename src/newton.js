@@ -34,6 +34,7 @@ const recursiveSubRoutine = ({ f, fp, guess, maxIter, curr, scope, variable }) =
  */
 module.exports = ({ eqn, variable, scope, guess }) => {
     console.log(chalk.blue("Running Newton's method for equation: ", eqn))
+    console.log(chalk.blue("Initial guess: ", guess))
     let start = process.hrtime()
     const der = math.derivative(eqn, variable)
     const result = recursiveSubRoutine({ f: eqn, fp: der, guess, maxIter: 40, curr: 0, scope, variable })

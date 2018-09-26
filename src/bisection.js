@@ -19,7 +19,7 @@ const findInterval = ({ eqn, scope, variable, left, right, stepSize, ctr = 0 }) 
   let result_left = math.eval(eqn, scope_left)
   let result_right = math.eval(eqn, scope_right)
 
-  while (math.eval(eqn, scope_left) * math.eval(eqn, scope_right) >= 0 && ctr++ < 300) {
+  while (math.eval(eqn, scope_left) * math.eval(eqn, scope_right) >= 0 && ctr++ < 10000) {
     left -= stepSize
     right += stepSize
     scope_left[variable] = left
@@ -33,10 +33,10 @@ const findInterval = ({ eqn, scope, variable, left, right, stepSize, ctr = 0 }) 
     } if (Number.isNaN(result_right)) {
       right += stepSize
       scope_right[variable] = right
-      scope_right = math.eval(eqn, scope_right)
+      result_right = math.eval(eqn, scope_right)
     }
   }
-  if (ctr >= 300) {
+  if (ctr >= 10000) {
     throw new Error(`Could not find the interval within ${ctr} iterations`)
   }
   return { left, right }
@@ -72,6 +72,7 @@ const recursiveSubroutine = ({ eqn, left, right, scope, variable }) => {
  */
 module.exports = ({ eqn, variable, scope, guess }) => {
   console.log(chalk.red("Running Bisection method for equation: ", eqn))
+  console.log(chalk.red("Initial guess: ", guess))
   let start = process.hrtime()
   const { left, right } = findInterval({ eqn, scope, variable, left: guess, right: guess, stepSize: 0.5 })
   const result = recursiveSubroutine({ eqn, left, right, scope, variable })
